@@ -4,92 +4,87 @@
 #include <string.h>
 #include <stdlib.h>
 
-int only_digits(string code);
+/**
+ * @brief Validates whether the given string consists of only
+ *
+ * @param code
+ * @return int
+ */
+int is_valid_cipher_key(string code);
 char rotate(char a, int n);
 
 int main(int argc, string argv[])
 {
-    //saving a key int for later so the code compiles
-    int key = 0;
+    // validate command line arguments
 
-    //check if the input has 0, 1, or 1+ arguments
-    if (argc == 1)
+    // has the user supplied the correct number of command line arguments?
+    // [ program_name, caesar_key ]
+    if (argc != 2)
     {
         printf("./caesar key\n");
-        return 1;
+        return 0;
     }
 
-    else if (argc > 2)
+    // validate that the supplied argument is a valid caesar cipher key
+    int caesar_key = argv[1];
+    
+
+    if (!is_valid_cipher_key(caesar_key)
     {
         printf("./caesar key\n");
-        return 1;
+        return 0;
     }
-    else
+    int key = atoi(caesar_key);
+    // a key larger than 26 is extraneous, lop it off
+    key = key % 26;
+
+    // collect the text to encrypt
+    string plaintext = get_string("plaintext: ");
+
+    // print the the cipher text
+    printf("ciphertext: ");
+    for (int i = 0; i < strlen(plaintext); i++)
     {
-        int digit = only_digits(argv[1]);
-
-        if (digit == 0)
-        {
-            key = atoi(argv[1]);
-
-            string plaintext = get_string("plaintext: ");
-            printf("ciphertext: ");
-            for (int i = 0; i < strlen(plaintext); i++)
-            {
-                char h = rotate(plaintext[i], key);
-                printf("%c", h);
-            }
-            printf("\n");
-        }
-
-        else
-        {
-            printf("./caesar key\n");
-            return 1;
-        }
+        char h = rotate(plaintext[i], key);
+        printf("%c", h);
     }
+    printf("\n");
 }
 
-//takes in argv[1] from original command line
-int only_digits(string cmd1)
+// test whether the given string is a valid caesar cipher key by validating that each character is a digit 0-9
+bool is_valid_cipher_key(string cmd1)
 {
-    //this could be reworked back into a boolean, but I changed it to an int to see where I had made a mistake
+    // this could be reworked back into a boolean, but I changed it to an int to see where I had made a mistake
     int fails = 0;
     for (int i = 0; i < strlen(cmd1); i++)
     {
         if (!isdigit(cmd1[i]))
         {
-            fails = fails + 1;
+            fails++;
         }
     }
-    return fails;
+    return fails > 0;
 }
 
-char rotate(char a, int n)
+// add the caeser cipher to the key, wrapping around to the beginning of the alphabet if necessary
+char rotate(char c, int cipher_key)
 {
-    //any extra 'n' is extraneous, lop it off
-    n = n % 26;
-
-    //modify if it's a letter, leave it otherwise
-    if (islower(a))
+    // modify if it's a letter, leave it otherwise
+    if (islower(c))
     {
-        a = a - 97;
-        a = a + n;
-        if (a > 25)
-        {
-            a = a - 26;
-        }
-        a = a + 97;
+        return (c - 'a' + cipher_key) % 26 + 'a';
     }
-    else if (isupper(a))
+    else if (isupper(c))
     {
-        a = a - 65;
-        a = a + n;
-        if (a > 25)
+        char new_c = c - 'A' + cipher_key;
+        if (new_c > 25)
         {
-            a = a - 26;
+            new_c = new_c - 26;
         }
-        a = a + 65;
+        return new_c + 'A';
     }
-    return a;
+    else
+    {
+        return c;
+    }
 }
