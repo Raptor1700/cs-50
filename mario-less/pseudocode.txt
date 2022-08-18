@@ -1,2 +1,0 @@
-get height between 1-8
-print "#" for each level
